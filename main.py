@@ -39,12 +39,21 @@ if "\\" in outputPath:
 if outputPath[-1] != "/":
     outputPath += "/"
 
+if filename[-1:-4] != ".pdf":
+    filename += ".pdf"
+
 subfolders = [(f.path + "/") for f in os.scandir(inputPath) if f.is_dir()]
 subfolders = natsorted(subfolders, alg=ns.IGNORECASE)                           # For some reason, Python seeks dirs with ASCII order and not natural order (1,2...10,11...)
 
 if subfolderStructureCheck.lower() == "y":
     for folder in subfolders:
-        imageList += [(folder + image) for image in os.listdir(folder) if image.endswith(".jpg")]
+        imageList += [(folder + image) for image in os.listdir(folder) if (image.endswith(".jpg") or image.endswith(".png"))]
 
     with open(inputPath + filename, "wb") as file:
+        file.write(img2pdf.convert(imageList))
+
+if subfolderStructureCheck.lower() == "n":
+    imageList = [(inputPath + image) for image in os.listdir(inputPath) if (image.endswith(".jpg") or image.endswith(".png"))]
+    imageList = natsorted(imageList, alg=ns.IGNORECASE)
+    with open(outputPath + filename, "wb") as file:
         file.write(img2pdf.convert(imageList))
